@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, 'Courier New', monospace;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #00ff41;
+  background-color: #000000;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  background-color: #000;
+}
+
+@layer utilities {
+  .text-matrix-glow {
+    text-shadow: 0 0 5px #00ff41, 0 0 10px #00ff41, 0 0 15px #00ff41;
+  }
+
+  .border-matrix-glow {
+    box-shadow: 0 0 5px #00ff41, inset 0 0 5px rgba(0, 255, 65, 0.1);
+  }
+
+  .crt-scanlines {
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+  }
+
+  .terminal-cursor {
+    animation: blink 1s step-end infinite;
+  }
+
+  .scrollbar-matrix::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-matrix::-webkit-scrollbar-track {
+    background: #000;
+  }
+
+  .scrollbar-matrix::-webkit-scrollbar-thumb {
+    background: #003b00;
+    border: 1px solid #00ff41;
+  }
+
+  .scrollbar-matrix::-webkit-scrollbar-thumb:hover {
+    background: #008f11;
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+::selection {
+  background: #003b00;
+  color: #00ff41;
+}
