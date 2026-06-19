@@ -22,4 +22,5 @@ export interface ICellularAutomaton {
   getGrid(): Uint8Array;
   getInternalGrid(): Uint8Array;
   clone(): ICellularAutomaton;
+  setGeneration(generation: number): void;
 }

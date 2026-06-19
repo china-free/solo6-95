@@ -145,6 +145,10 @@ export class CellularAutomaton implements ICellularAutomaton {
     return this.current;
   }
 
+  setGeneration(generation: number): void {
+    this._generation = generation;
+  }
+
   countAliveInRegion(cx: number, cy: number, radius: number): number {
     let count = 0;
     for (let dy = -radius; dy <= radius; dy++) {

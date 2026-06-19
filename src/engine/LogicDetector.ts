@@ -5,6 +5,7 @@ export class LogicDetector {
   private ca: CellularAutomaton;
   private level: Level;
   private savedState: Uint8Array | null = null;
+  private savedGeneration: number = 0;
 
   constructor(ca: CellularAutomaton, level: Level) {
     this.ca = ca;
@@ -13,11 +14,13 @@ export class LogicDetector {
 
   saveState(): void {
     this.savedState = new Uint8Array(this.ca.getInternalGrid());
+    this.savedGeneration = this.ca.stats.generation;
   }
 
   restoreState(): void {
     if (this.savedState) {
       this.ca.getInternalGrid().set(this.savedState);
+      this.ca.setGeneration(this.savedGeneration);
     }
   }
 
@@ -38,19 +41,27 @@ export class LogicDetector {
     }
   }
 
-  detectOutput(output: DetectionPoint): 0 | 1 {
-    const radius = output.radius ?? 3;
-    let total = 0;
+  detectAllOutputs(): Record<string, 0 | 1> {
+    const outputs = this.level.outputs;
     const windowSize = this.level.detectionWindow;
+    const threshold = this.level.detectionThreshold;
+
+    const counts = new Float64Array(outputs.length);
+    const radii = outputs.map((o) => o.radius ?? 3);
 
     for (let i = 0; i < windowSize; i++) {
-      total += this.ca.countAliveInRegion(output.x, output.y, radius);
+      for (let o = 0; o < outputs.length; o++) {
+        counts[o] += this.ca.countAliveInRegion(outputs[o].x, outputs[o].y, radii[o]);
+      }
       this.ca.step();
     }
 
-    const average = total / windowSize;
-    const threshold = this.level.detectionThreshold;
-    return average > threshold ? 1 : 0;
+    const result: Record<string, 0 | 1> = {};
+    for (let o = 0; o < outputs.length; o++) {
+      const average = counts[o] / windowSize;
+      result[outputs[o].id] = average > threshold ? 1 : 0;
+    }
+    return result;
   }
 
   async testTruthTableEntry(entry: TruthTableEntry): Promise<TestResult> {
@@ -66,10 +77,7 @@ export class LogicDetector {
       this.ca.step();
     }
 
-    const actualOutputs: Record<string, 0 | 1> = {};
-    for (const output of this.level.outputs) {
-      actualOutputs[output.id] = this.detectOutput(output);
-    }
+    const actualOutputs = this.detectAllOutputs();
 
     let passed = true;
     for (const output of this.level.outputs) {
